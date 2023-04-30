@@ -13,3 +13,10 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::post('/login', function (Request $req) {
+    print($req);
+});
+Route::post('/register', function (Request $req) {
+    print($req);
+});

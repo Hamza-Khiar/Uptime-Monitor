@@ -12,3 +12,8 @@ app.use(createPinia())
 app.use(router)
 
 app.mount('#app')
+
+/**
+ *
+ * You can add here other config like app.config.globalProperties and stuff like that
+ */
