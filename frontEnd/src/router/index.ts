@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeComp from '../components/HomeComp.vue'
 import LoginComp from '../components/LoginComp.vue'
 import RegisterComp from '../components/RegisterComp.vue'
 

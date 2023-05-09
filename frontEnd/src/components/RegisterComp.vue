@@ -9,10 +9,10 @@ import { BACKEND_URL } from '../env'
 
 // i'll have to firstly capture the data & then send
 
-async function loggerVal(ev) {
+async function loggerVal(ev: any) {
+  ev.preventDefault()
   let registerForm = ev.target
   let formData = new FormData(registerForm)
-  console.log(JSON.stringify(Object.fromEntries(formData)))
   let response = await fetch(BACKEND_URL + '/register', {
     method: 'POST',
     mode: 'no-cors',
@@ -22,8 +22,11 @@ async function loggerVal(ev) {
     },
     body: JSON.stringify(Object.fromEntries(formData))
   })
+  let result = await response.json()
+  console.log(result)
 }
 </script>
+
 <template>
   <div class="auth-container h-screen flex align-middle">
     <div class="w-1/4 m-auto border-2 h-1/2 bg-gray-200">
@@ -32,7 +35,6 @@ async function loggerVal(ev) {
         class="flex flex-col w-4/5 my-0 mx-auto"
         data-formType="registerForm"
         name="registerForm"
-        v-on:submit.prevent="onsubmit"
         @submit="loggerVal"
       >
         <label for="FullName">FullName</label>
