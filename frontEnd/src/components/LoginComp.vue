@@ -4,7 +4,6 @@ import { RouterLink } from 'vue-router'
 /**
  * some form handling and after finished; sending your first request to laravel
  */
-
 </script>
 <template>
   <div class="auth-container h-screen flex align-middle">
@@ -20,6 +19,7 @@ import { RouterLink } from 'vue-router'
         <input type="text" name="email" id="" />
         <label for="password">Password</label>
         <input type="text" name="password" id="" />
+        <!-- <button type="submit">login</button> -->
         <RouterLink to="/register">don't have an account</RouterLink>
       </form>
     </div>

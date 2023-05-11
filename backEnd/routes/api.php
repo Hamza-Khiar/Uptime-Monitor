@@ -14,5 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::post('/login',);
-// Route::post('/register',);
+Route::post('/login', function (Request $req) {
+    return response('login');
+});
+Route::post('/register', function (Request $req) {
+    return response('register');
+});

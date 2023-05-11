@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { BACKEND_URL } from '../env'
+import { AUTH_CSRF_COOKIE_URL, BACKEND_URL } from '../env'
+import { onMounted } from 'vue'
 /**
  * some form handling and after finished; sending your first request to laravel
  *
@@ -9,13 +10,25 @@ import { BACKEND_URL } from '../env'
 
 // i'll have to firstly capture the data & then send
 
-async function loggerVal(ev: any) {
+onMounted(async () => {
+  let xsrfHeaderReq = await fetch(AUTH_CSRF_COOKIE_URL, {
+    method: 'GET',
+    credentials: 'include'
+  })
+})
+
+async function loggerVal(ev: Event) {
   ev.preventDefault()
-  let registerForm = ev.target
+  /**
+   *  i'll need some utility function who'll call that will deal with;
+   *    * Form-Validation
+   *    * Fetching FormData (get,post,delete,patch)
+   */
+  let registerForm = ev.currentTarget as HTMLFormElement
   let formData = new FormData(registerForm)
   let response = await fetch(BACKEND_URL + '/register', {
     method: 'POST',
-    mode: 'no-cors',
+    // mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*'
