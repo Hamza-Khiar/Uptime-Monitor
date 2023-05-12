@@ -1,9 +1,18 @@
 <script setup lang="ts">
+import { AUTH_CSRF_COOKIE_URL, BACKEND_URL } from '@/env'
+import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 
 /**
  * some form handling and after finished; sending your first request to laravel
  */
+
+onMounted(async () => {
+  await fetch(AUTH_CSRF_COOKIE_URL, {
+    method: 'GET',
+    credentials: 'include'
+  })
+})
 </script>
 <template>
   <div class="auth-container h-screen flex align-middle">
