@@ -15,7 +15,8 @@ onMounted(async () => {
   await fetch(AUTH_CSRF_COOKIE_URL, {
     method: 'GET',
     credentials: 'include'
-  }) /* .then(console.log(document.cookie)) */
+  })
+  /* .then(console.log(document.cookie)) */
 })
 
 /**
@@ -23,14 +24,9 @@ onMounted(async () => {
  */
 
 async function handleSubmition(ev: Event) {
-  /**
-   *  i'll need some utility function who'll call that will deal with;
-   *    * Form-Validation
-   *    * Fetching FormData (get,post,delete,patch)
-   */
   let registerForm = ev.currentTarget as HTMLFormElement
   let formData = Object.fromEntries(new FormData(registerForm))
-  FormValidate(formData, {
+  const validateForm: any = FormValidate(formData, {
     required: {
       applyTo: ['UserName', 'Email', 'Password', 'Confirmation']
     },
@@ -38,6 +34,10 @@ async function handleSubmition(ev: Event) {
       applyTo: ['Email']
     }
   })
+  if (validateForm != undefined || validateForm.length != 0) {
+    // 
+  }
+
   // let response = await fetch(BACKEND_URL + '/register', {
   //   method: 'POST',
   //   headers: {
@@ -65,18 +65,22 @@ async function handleSubmition(ev: Event) {
         <label
           >UserName:
           <input class="w-full my-2" type="text" name="UserName" />
+          <span></span>
         </label>
         <label
           >Email:
           <input class="w-full my-2" type="text" name="Email" />
+          <span></span>
         </label>
         <label
           >Password:
           <input class="w-full my-2" type="text" name="Password" />
+          <span></span>
         </label>
         <label
           >Confirmation:
           <input class="w-full my-2" type="text" name="Confirmation" />
+          <span></span>
         </label>
         <button class="block w-1/2 bg-slate-300 rounded mx-auto p-1" type="submit">register</button>
         <RouterLink to="/login" class="contents">already registered</RouterLink>

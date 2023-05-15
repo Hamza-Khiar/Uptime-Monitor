@@ -14,5 +14,6 @@ export type Rules = {
   }
 }
 export interface IForm {
-  [index: string]: string | FormDataEntryValue
+  [index: string]: FormDataEntryValue | string | any
 }
+
