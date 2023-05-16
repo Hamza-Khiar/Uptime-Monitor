@@ -1,6 +1,7 @@
 import type { IForm } from '@/types'
 class Validator {
   private form: IForm
+  private equalsToArray: Array<string> = []
   /**
    * taking the form Object and run some Checks in it
    */
@@ -40,6 +41,14 @@ class Validator {
     } else {
       return
     }
+  }
+  equals(field: string) {
+    this.equalsToArray.push(this.form[field])
+    if (this.equalsToArray.length !== 2) {
+      return null
+    } else if (this.equalsToArray[0] !== this.equalsToArray[1]) {
+      throw new Error("The Confirmation & Password aren't the same")
+    } else return
   }
 }
 

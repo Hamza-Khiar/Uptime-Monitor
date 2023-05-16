@@ -10,7 +10,7 @@ export function formValidate(form: IForm, rulesToApply: Rules) {
     rulesToApply[key as keyof Rules]?.applyTo.forEach((field: string) => {
       const errorsObj: IForm = {}
       try {
-        formToTest[key](field, extraArgs.minlength)
+        formToTest[key](field, extraArgs?.minlength)
       } catch (err: any) {
         errorsObj[field] = err
         validateCapture.push(errorsObj)

@@ -38,6 +38,9 @@ async function handleSubmition(ev: Event) {
     minlength: {
       value: 8,
       applyTo: ['UserName', 'Password', 'Confirmation']
+    },
+    equals: {
+      applyTo: ['Password', 'Confirmation']
     }
   })
 

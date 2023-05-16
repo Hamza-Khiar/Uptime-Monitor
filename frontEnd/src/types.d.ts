@@ -12,8 +12,10 @@ export type Rules = {
     value: number
     applyTo: string[]
   }
+  equals?: {
+    applyTo: [string, string]
+  }
 }
 export interface IForm {
   [index: string]: FormDataEntryValue | string | any
 }
-
