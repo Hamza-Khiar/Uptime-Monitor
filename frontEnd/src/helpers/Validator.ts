@@ -7,16 +7,17 @@ class Validator {
   constructor(form: IForm) {
     this.form = form
   }
-  minLength(field: string, length: number) {
-    // const regExpStr = `/.{${length},}/`
-    // let regExp = new RegExp(regExpStr)
-    // regExp.test()
+  minlength(field: string, length: number) {
+    if (this.form[field].length < length) {
+      const message = `${field} should contain at least ${length} characters long`
+      throw new Error(message)
+    } else return
   }
   required(field: string) {
-    const regExp = /^\w{3,}/
+    const regExp = /^\w/
     const result = regExp.test(this.form[field])
     if (result == false) {
-      const message = `${field} should contain at least 3 characters long`
+      const message = `${field} is Empty`
       throw new Error(message)
     } else {
       return

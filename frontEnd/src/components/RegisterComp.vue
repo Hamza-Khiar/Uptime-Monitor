@@ -26,18 +26,19 @@ onMounted(async () => {
 async function handleSubmition(ev: Event) {
   let registerForm = ev.currentTarget as HTMLFormElement
   let formData = Object.fromEntries(new FormData(registerForm))
-  const validateForm: any = FormValidate(formData, {
+  const validateForm = FormValidate(formData, {
     required: {
       applyTo: ['UserName', 'Email', 'Password', 'Confirmation']
     },
     email: {
       applyTo: ['Email']
+    },
+    minlength: {
+      value: 8,
+      applyTo: ['UserName', 'Password', 'Confirmation']
     }
   })
-  if (validateForm != undefined || validateForm.length != 0) {
-    // 
-  }
-
+  console.log(validateForm)
   // let response = await fetch(BACKEND_URL + '/register', {
   //   method: 'POST',
   //   headers: {
