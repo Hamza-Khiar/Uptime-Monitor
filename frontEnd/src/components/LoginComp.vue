@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AUTH_CSRF_COOKIE_URL, BACKEND_URL } from '@/env'
-import { onMounted } from 'vue'
+import { formValidate } from '@/helpers/FormHandler'
+import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
 /**
@@ -13,6 +14,24 @@ onMounted(async () => {
     credentials: 'include'
   })
 })
+
+let errorForm = ref()
+
+async function handleSubmition(ev: Event) {
+  let loginForm = ev.currentTarget as HTMLFormElement
+  let formData = Object.fromEntries(new FormData(loginForm))
+  console.log(formData)
+  const validateForm = formValidate(formData, {
+    required: {
+      applyTo: ['email', 'password']
+    },
+    email: {
+      applyTo: ['email']
+    }
+  })
+}
+
+
 </script>
 <template>
   <div class="auth-container h-screen flex align-middle">
@@ -23,6 +42,7 @@ onMounted(async () => {
         class="flex flex-col w-4/5 my-0 mx-auto"
         name="loginForm"
         data-formType="loginForm"
+        @submit.prevent="handleSubmition"
       >
         <label class="mb-4"
           >Email:
@@ -34,7 +54,7 @@ onMounted(async () => {
 
           <input class="w-full" type="text" name="password" id="" />
         </label>
-        <!-- <button type="submit">login</button> -->
+        <button class="block w-1/2 bg-slate-300 rounded mx-auto p-1" type="submit">login</button>
         <RouterLink to="/register">don't have an account</RouterLink>
       </form>
     </div>

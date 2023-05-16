@@ -2,7 +2,7 @@
 import { RouterLink } from 'vue-router'
 import { AUTH_CSRF_COOKIE_URL, BACKEND_URL } from '../env'
 import { formValidate } from '@/helpers/FormHandler'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 /**
  * *******************************************************
@@ -16,7 +16,6 @@ onMounted(async () => {
     method: 'GET',
     credentials: 'include'
   })
-  /* .then(console.log(document.cookie)) */
 })
 
 /**
@@ -28,33 +27,34 @@ let errorForm = ref()
 async function handleSubmition(ev: Event) {
   let registerForm = ev.currentTarget as HTMLFormElement
   let formData = Object.fromEntries(new FormData(registerForm))
+  console.log(formData)
   const validateForm = formValidate(formData, {
     required: {
-      applyTo: ['UserName', 'Email', 'Password', 'Confirmation']
+      applyTo: ['username', 'email', 'password', 'password_confirmation']
     },
     email: {
-      applyTo: ['Email']
+      applyTo: ['email']
     },
     minlength: {
       value: 8,
-      applyTo: ['UserName', 'Password', 'Confirmation']
+      applyTo: ['username', 'password', 'password_confirmation']
     },
     equals: {
-      applyTo: ['Password', 'Confirmation']
+      applyTo: ['password', 'password_confirmation']
     }
   })
 
   if (!validateForm.length) {
-    // let response = await fetch(BACKEND_URL + '/register', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Access-Control-Allow-Origin': '*'
-    //   },
-    //   body: JSON.stringify(Object.fromEntries(formData))
-    // })
-    // let result = await response.json()
-    // console.log(result)
+    let response = await fetch(BACKEND_URL + '/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify(formData)
+    })
+    let result = await response.json()
+    console.log(result)
   } else {
     console.log(validateForm)
     errorForm.value = validateForm
@@ -74,30 +74,30 @@ async function handleSubmition(ev: Event) {
       >
         <label class="mb-4"
           >UserName:
-          <input class="w-full" type="text" name="UserName" />
+          <input class="w-full" type="text" name="username" />
           <div v-for="error in errorForm" :key="error">
-            <span class="text-sm text-red-600">{{ error?.UserName?.message }}</span>
+            <span class="text-sm text-red-600">{{ error?.username?.message }}</span>
           </div>
         </label>
         <label class="mb-4"
           >Email:
-          <input class="w-full" type="text" name="Email" />
+          <input class="w-full" type="text" name="email" />
           <div v-for="error in errorForm" :key="error">
-            <span class="text-sm text-red-600">{{ error?.Email?.message }}</span>
+            <span class="text-sm text-red-600">{{ error?.email?.message }}</span>
           </div>
         </label>
         <label class="mb-4"
           >Password:
-          <input class="w-full" type="text" name="Password" />
+          <input class="w-full" type="text" name="password" />
           <div v-for="error in errorForm" :key="error">
-            <span class="text-sm text-red-600">{{ error?.Password?.message }}</span>
+            <span class="text-sm text-red-600">{{ error?.password?.message }}</span>
           </div>
         </label>
         <label class="mb-4"
           >Confirmation:
-          <input class="w-full" type="text" name="Confirmation" />
+          <input class="w-full" type="text" name="password_confirmation" />
           <div v-for="error in errorForm" :key="error">
-            <span class="text-sm text-red-600">{{ error?.Confirmation?.message }}</span>
+            <span class="text-sm text-red-600">{{ error?.password_confirmation?.message }}</span>
           </div>
         </label>
         <button class="block w-1/2 bg-slate-300 rounded mx-auto p-1" type="submit">register</button>

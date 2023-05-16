@@ -33,7 +33,7 @@ class Validator {
   }
   email(field: string) {
     // eslint-disable-next-line no-useless-escape
-    const regExp = /^[\w\-(\.)]+@([\w-]+\.)+[\w-]{2,4}$/
+    const regExp = /^[\w\-(\.)]+@([\w-]+\.)+[\w-]{2,}$/
     const result = regExp.test(this.form[field])
     if (result == false) {
       const message = `Check that ${field} is a valid email`
