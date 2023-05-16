@@ -1,7 +1,7 @@
 import type { IForm, Rules } from '@/types'
 import Validator from './Validator'
 
-export function FormValidate(form: IForm, rulesToApply: Rules) {
+export function formValidate(form: IForm, rulesToApply: Rules) {
   const formToTest: { [key: string]: any } = new Validator(form)
   const validateCapture: object[] = []
   const extraArgs: any = {}
@@ -17,6 +17,5 @@ export function FormValidate(form: IForm, rulesToApply: Rules) {
       }
     })
   }
-  console.log(validateCapture, formToTest.form)
   return validateCapture
 }

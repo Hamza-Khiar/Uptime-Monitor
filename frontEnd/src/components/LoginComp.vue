@@ -24,10 +24,16 @@ onMounted(async () => {
         name="loginForm"
         data-formType="loginForm"
       >
-        <label for="email">Email</label>
-        <input type="text" name="email" id="" />
-        <label for="password">Password</label>
-        <input type="text" name="password" id="" />
+        <label class="mb-4"
+          >Email:
+
+          <input class="w-full" type="text" name="email" id="" />
+        </label>
+        <label class="mb-4"
+          >Password:
+
+          <input class="w-full" type="text" name="password" id="" />
+        </label>
         <!-- <button type="submit">login</button> -->
         <RouterLink to="/register">don't have an account</RouterLink>
       </form>
