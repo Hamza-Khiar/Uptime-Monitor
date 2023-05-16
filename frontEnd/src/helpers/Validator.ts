@@ -24,10 +24,15 @@ class Validator {
     }
   }
   alpha(field: string) {
-    const regExp = /^[a-zA-Z\u{0020}]+/u
+    const regExp = /^[a-zA-Z\u0020]+/u
+    const result = regExp.test(this.form[field])
+    if (result == false) {
+      throw new Error(`the ${field} should only contain alphabetical characters`)
+    }
   }
   email(field: string) {
-    const regExp = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/
+    // eslint-disable-next-line no-useless-escape
+    const regExp = /^[\w\-(\.)]+@([\w-]+\.)+[\w-]{2,4}$/
     const result = regExp.test(this.form[field])
     if (result == false) {
       const message = `Check that ${field} is a valid email`
