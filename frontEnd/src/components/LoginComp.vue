@@ -4,15 +4,13 @@ import { formValidate } from '@/helpers/FormHandler'
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
-/**
- * some form handling and after finished; sending your first request to laravel
- */
-
 onMounted(async () => {
-  await fetch(AUTH_CSRF_COOKIE_URL, {
-    method: 'GET',
-    credentials: 'include'
-  })
+  if (!document.cookie) {
+    await fetch(AUTH_CSRF_COOKIE_URL, {
+      method: 'GET',
+      credentials: 'include'
+    })
+  }
 })
 
 let errorForm = ref()
@@ -30,8 +28,6 @@ async function handleSubmition(ev: Event) {
     }
   })
 }
-
-
 </script>
 <template>
   <div class="auth-container h-screen flex align-middle">

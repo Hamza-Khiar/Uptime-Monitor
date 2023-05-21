@@ -3,6 +3,7 @@ import { RouterLink } from 'vue-router'
 import { AUTH_CSRF_COOKIE_URL, BACKEND_URL } from '../env'
 import { formValidate } from '@/helpers/FormHandler'
 import { onMounted, ref } from 'vue'
+import { fetchFn } from '@/helpers/FetchFn'
 
 /**
  * *******************************************************
@@ -12,22 +13,19 @@ import { onMounted, ref } from 'vue'
  */
 
 onMounted(async () => {
-  await fetch(AUTH_CSRF_COOKIE_URL, {
-    method: 'GET',
-    credentials: 'include'
-  })
+  if (!document.cookie) {
+    await fetch(AUTH_CSRF_COOKIE_URL, {
+      method: 'GET',
+      credentials: 'include'
+    })
+  }
 })
-
-/**
- * making the Validation process
- */
 
 let errorForm = ref()
 
 async function handleSubmition(ev: Event) {
   let registerForm = ev.currentTarget as HTMLFormElement
   let formData = Object.fromEntries(new FormData(registerForm))
-  console.log(formData)
   const validateForm = formValidate(formData, {
     required: {
       applyTo: ['username', 'email', 'password', 'password_confirmation']
@@ -43,20 +41,12 @@ async function handleSubmition(ev: Event) {
       applyTo: ['password', 'password_confirmation']
     }
   })
-
   if (!validateForm.length) {
-    let response = await fetch(BACKEND_URL + '/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify(formData)
-    })
+    errorForm.value = null
+    let response = await fetchFn(BACKEND_URL + '/register', 'POST', JSON.stringify(formData))
     let result = await response.json()
     console.log(result)
   } else {
-    console.log(validateForm)
     errorForm.value = validateForm
   }
 }

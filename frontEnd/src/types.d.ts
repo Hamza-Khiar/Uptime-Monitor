@@ -13,7 +13,7 @@ export type Rules = {
     applyTo: string[]
   }
   equals?: {
-    applyTo: [string, string]
+    applyTo: [string, st]
   }
 }
 export interface IForm {
