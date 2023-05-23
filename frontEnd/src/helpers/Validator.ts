@@ -14,6 +14,13 @@ class Validator {
       throw new Error(message)
     } else return
   }
+  maxlength(field: string, length: number) {
+    if (this.form[field].length > length) {
+      console.log(length)
+      const message = `${field} should contain no more than ${length} characters long`
+      throw new Error(message)
+    } else return
+  }
   required(field: string) {
     const regExp = /^\w/
     const result = regExp.test(this.form[field])

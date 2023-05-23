@@ -19,15 +19,22 @@ class UserController extends Controller
         */
 
         $form_validation = $request->validate([
-            'username' => ['required', 'min:8'],
+            'username' => ['required', 'min:8', 'max:50'],
             'email' => ['required', 'email'],
             'password' => ['required', 'min:8'],
             'password_confirmation' => ['required', 'min:8', 'same:password']
         ]);
+        /* 
+            next i'll check the DB if there is anyone with the same userName/email/password with 
+        */
+
         return response()->json([
             'Body' => 'It registered'
         ], 201, [
             'Accept' => 'application/json'
         ]);
+    }
+    private function email_verification()/* it will get email from form data and send the email for verification */
+    {
     }
 }

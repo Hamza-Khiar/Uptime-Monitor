@@ -37,6 +37,10 @@ async function handleSubmition(ev: Event) {
       value: 8,
       applyTo: ['username', 'password', 'password_confirmation']
     },
+    maxlength: {
+      value: 50,
+      applyTo: ['username', 'password']
+    },
     equals: {
       applyTo: ['password', 'password_confirmation']
     }

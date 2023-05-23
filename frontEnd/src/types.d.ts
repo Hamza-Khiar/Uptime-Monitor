@@ -12,8 +12,12 @@ export type Rules = {
     value: number
     applyTo: string[]
   }
+  maxlength?: {
+    value: number
+    applyTo: string[]
+  }
   equals?: {
-    applyTo: [string, st]
+    applyTo: [string, string]
   }
 }
 export interface IForm {
