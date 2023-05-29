@@ -13,7 +13,7 @@ onMounted(async () => {
   }
 })
 
-let errorForm = ref()
+// let errorForm = ref()
 
 async function handleSubmition(ev: Event) {
   let loginForm = ev.currentTarget as HTMLFormElement
@@ -31,7 +31,7 @@ async function handleSubmition(ev: Event) {
 </script>
 <template>
   <div class="auth-container h-screen flex align-middle">
-    <div class="w-1/4 m-auto border-2 h-1/2 bg-gray-200">
+    <div class="w-1/4 m-auto border-2 h-fit p-4 bg-gray-200">
       <h3 class="text-3xl font-sans text-center">Login</h3>
       <form
         action="post"

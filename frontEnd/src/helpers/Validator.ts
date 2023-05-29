@@ -16,7 +16,6 @@ class Validator {
   }
   maxlength(field: string, length: number) {
     if (this.form[field].length > length) {
-      console.log(length)
       const message = `${field} should contain no more than ${length} characters long`
       throw new Error(message)
     } else return
