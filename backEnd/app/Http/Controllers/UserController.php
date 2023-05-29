@@ -53,14 +53,17 @@ class UserController extends Controller
     }
     public function validateUser(int $id)
     {
-        DB::table('users')->where('user_id', '=', "$id")->update([
-            'verified_at' => Carbon::now()
-        ]);
-        
+        if (DB::table('users')->where('user_id', '=', "$id")->get('verified_at') == null) {
+            DB::table('users')->where('user_id', '=', "$id")->update([
+                'verified_at' => Carbon::now()
+            ]);
+        }
+        return redirect(env('FRONTEND_URL') /* . '/dashboard' */);
         /*
             find a way to redirect in front-end with appropriate data:
                 - user info :user_name & email
                 - monitors 
+        }
         */
     }
     /**
