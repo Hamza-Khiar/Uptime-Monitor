@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@vue/tsconfig": "^0.3.2",
-    "ofetch": "^1.0.1",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },

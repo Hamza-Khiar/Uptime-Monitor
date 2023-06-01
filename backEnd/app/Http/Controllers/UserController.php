@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Mail\EmailVerification;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
@@ -53,12 +55,14 @@ class UserController extends Controller
     }
     public function validateUser(int $id)
     {
-        if (DB::table('users')->where('user_id', '=', "$id")->get('verified_at') == null) {
+        if (DB::table('users')->where('user_id', '=', "$id")->get('verified_at')->value('verified_at') == null) {
             DB::table('users')->where('user_id', '=', "$id")->update([
                 'verified_at' => Carbon::now()
             ]);
+        } else {
+            return throw new Exception("this user is already registered please Log-in");
         }
-        return redirect(env('FRONTEND_URL') /* . '/dashboard' */);
+        return redirect(env('FRONTEND_URL') . '/dashboard');
         /*
             find a way to redirect in front-end with appropriate data:
                 - user info :user_name & email

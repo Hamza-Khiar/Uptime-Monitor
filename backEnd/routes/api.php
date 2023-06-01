@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -18,3 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/register', [UserController::class, 'register']);
 Route::get('/validated_user/{id}', [UserController::class, 'validateUser']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/dashboard', [MonitorController::class, 'index']);
+});
