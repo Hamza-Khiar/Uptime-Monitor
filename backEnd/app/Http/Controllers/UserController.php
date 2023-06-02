@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\EmailVerification;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -53,16 +54,21 @@ class UserController extends Controller
             ], 500);
         }
     }
-    public function validateUser(int $id)
+    public function validateUser(Request $request, int $id)
     {
+
         if (DB::table('users')->where('user_id', '=', "$id")->get('verified_at')->value('verified_at') == null) {
             DB::table('users')->where('user_id', '=', "$id")->update([
                 'verified_at' => Carbon::now()
             ]);
-        } else {
+        } /* else {
             return throw new Exception("this user is already registered please Log-in");
-        }
-        return redirect(env('FRONTEND_URL') . '/dashboard');
+        } */
+        $user = DB::table('users')->where('user_id', '=', "$id")->first();
+        return $this->authenticate_user($request, [
+            'email' => $user->email,
+            'password' => $user->password
+        ]);
         /*
             find a way to redirect in front-end with appropriate data:
                 - user info :user_name & email
@@ -70,6 +76,7 @@ class UserController extends Controller
         }
         */
     }
+
     /**
      * *********************************
      * private functions
@@ -91,5 +98,13 @@ class UserController extends Controller
     private function email_verification(string $email, int $id)
     {
         Mail::to($email)->send(new EmailVerification($id));
+    }
+    private function authenticate_user(Request $request, array $user)
+    {
+        if (Auth::attempt($user)) {
+            dd($user);
+            $request->session()->regenerate();
+            return redirect(env('FRONTEND_URL') . '/dashboard');
+        }
     }
 }
