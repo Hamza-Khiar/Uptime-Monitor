@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('monitor_notifications', function (Blueprint $table) {
-            $table->id('montification_id');
-            $table->foreignId('monitor_id')->references('monitor_id')->on('monitors');
-            $table->foreignId('notification_id')->references('notification_id')->on('notifications');
+            $table->id('id');
+            $table->foreignId('monitor_id')->references('id')->on('monitors');
+            $table->foreignId('notification_id')->references('id')->on('notifications');
 
             $table->timestamps();
         });

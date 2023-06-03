@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('incidents', function (Blueprint $table) {
-            $table->id('incidents');
+            $table->id('id');
             $table->foreignUuid('check_uuid')->references('check_uuid')->on('checks');
             $table->integer('status_code');
             $table->timestamp('first_timestamp');

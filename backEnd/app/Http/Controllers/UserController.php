@@ -21,9 +21,18 @@ class UserController extends Controller
      */
     public function login(Request $request)
     {
-        /* 
-            i'm checking on whether if the user is registered in the db and redirect to the dashboard
-        */
+        /**
+         * first step : validate form & check if there is a user with the same credentials;
+         * second step : if there is 
+         */
+        $form_validation = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required']
+        ]);
+        if (Auth::guard('web')->attempt($form_validation)) {
+            dd($request->session()->invalidate());
+        }
+        return response('hey there login');
     }
     public function register(Request $request)
     {
@@ -42,33 +51,27 @@ class UserController extends Controller
                 'email' => $form_validation['email'],
                 'password' => bcrypt($form_validation['password']),
                 'verified_at' => null
-            ], 'user_id');
-            $this->email_verification($form_validation['email'], $id);
+            ], 'id');
+            $this->emailVerification($form_validation['email'], $id);
             return response()->json([
                 'Verification' => 'we just sent an email, please verify'
             ]);
         } else {
-            $errors = $this->check_similar_data($check_user, $form_validation);
+            $errors = $this->checkSimilarData($check_user, $form_validation);
             return response()->json([
                 'Error' => $errors
             ], 500);
         }
     }
-    public function validateUser(Request $request, int $id)
+    public function validateUser(int $id)
     {
 
-        if (DB::table('users')->where('user_id', '=', "$id")->get('verified_at')->value('verified_at') == null) {
-            DB::table('users')->where('user_id', '=', "$id")->update([
+        if (DB::table('users')->where('id', '=', "$id")->get('verified_at')->value('verified_at') == null) {
+            DB::table('users')->where('id', '=', "$id")->update([
                 'verified_at' => Carbon::now()
             ]);
-        } /* else {
-            return throw new Exception("this user is already registered please Log-in");
-        } */
-        $user = DB::table('users')->where('user_id', '=', "$id")->first();
-        return $this->authenticate_user($request, [
-            'email' => $user->email,
-            'password' => $user->password
-        ]);
+        }
+        return redirect(env('FRONTEND_URL') . '/login');
         /*
             find a way to redirect in front-end with appropriate data:
                 - user info :user_name & email
@@ -82,7 +85,7 @@ class UserController extends Controller
      * private functions
      * *********************************
      */
-    private function check_similar_data(Collection $check_user, array $form_validation)
+    private function checkSimilarData(Collection $check_user, array $form_validation)
     {
         $errors = [];
         $elments_to_check = ['username', 'email'];
@@ -95,16 +98,12 @@ class UserController extends Controller
         }
         return $errors;
     }
-    private function email_verification(string $email, int $id)
+    private function emailVerification(string $email, int $id)
     {
         Mail::to($email)->send(new EmailVerification($id));
     }
-    private function authenticate_user(Request $request, array $user)
+    private function tokenIssuer()
     {
-        if (Auth::attempt($user)) {
-            dd($user);
-            $request->session()->regenerate();
-            return redirect(env('FRONTEND_URL') . '/dashboard');
-        }
+        // 
     }
 }

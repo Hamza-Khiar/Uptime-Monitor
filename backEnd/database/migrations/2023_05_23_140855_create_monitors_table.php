@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('monitors', function (Blueprint $table) {
-            $table->id('monitor_id');
-            $table->foreignId('user_id')->references('user_id')->on('users');
+            $table->id('id');
+            $table->foreignId('user_id')->references('id')->on('users');
             $table->string('friendly_name');
             $table->string('url');
             $table->boolean('active')->default(true);

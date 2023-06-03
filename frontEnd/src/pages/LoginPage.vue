@@ -1,19 +1,10 @@
 <script setup lang="ts">
 import AuthRegistry from '../layouts/AuthRegistry.vue'
-import { AUTH_CSRF_COOKIE_URL, BACKEND_URL } from '@/env'
+import { BACKEND_URL } from '@/env'
 import { fetchFn } from '@/helpers/FetchFn'
 import { formValidate } from '@/helpers/FormHandler'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
-
-onMounted(async () => {
-  if (!document.cookie) {
-    await fetch(AUTH_CSRF_COOKIE_URL, {
-      method: 'GET',
-      credentials: 'include'
-    })
-  }
-})
 
 let errorForm = ref()
 
@@ -31,7 +22,12 @@ async function handleSubmition(ev: Event) {
   })
   if (!validateForm.length) {
     errorForm.value == null
-    let response = await fetchFn(BACKEND_URL + '/login', 'POST', JSON.stringify(formData))
+    let response = await fetchFn(
+      'http://localhost:8000' + '/login',
+      'POST',
+      JSON.stringify(formData),
+      true
+    )
     let result = await response.json()
     if ('Error' in result) {
       errorForm.value = [result['Error']]

@@ -9,27 +9,36 @@ const defaultHeader: { [key: string]: string } = {
   credentials: 'include'
 }
 
-async function cookieExists() {
-  if (!document.cookie) {
-    await fetch(AUTH_CSRF_COOKIE_URL, {
-      method: 'GET',
-      credentials: 'include'
-    })
-  }
-  if (document.cookie && !defaultHeader?.['X-XSRF-TOKEN']) {
-    Object.assign(defaultHeader, {
-      'X-XSRF-TOKEN': document.cookie.split('=')[1]
-    })
-    console.log(defaultHeader)
+async function cookieExists(csrfRequired: boolean) {
+  if (csrfRequired) {
+    if (!document.cookie) {
+      await fetch(AUTH_CSRF_COOKIE_URL, {
+        method: 'GET',
+        credentials: 'include'
+      })
+    }
+    if (document.cookie && !defaultHeader?.['X-XSRF-TOKEN']) {
+      Object.assign(defaultHeader, {
+        'X-XSRF-TOKEN': decodeURIComponent(document.cookie).slice(
+          decodeURIComponent(document.cookie).indexOf('=') + 1
+        )
+      })
+      console.log(
+        defaultHeader,
+        decodeURIComponent(document.cookie).slice(decodeURIComponent(document.cookie).indexOf('='))
+      )
+    }
   }
 }
 
 export const fetchFn = async function (
   resource: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-  Body: BodyInit
+  Body: BodyInit,
+  csrfRequired: boolean
 ) {
-  await cookieExists()
+  await cookieExists(csrfRequired)
+
   const response = await fetch(resource, {
     method: method,
     headers: defaultHeader,
