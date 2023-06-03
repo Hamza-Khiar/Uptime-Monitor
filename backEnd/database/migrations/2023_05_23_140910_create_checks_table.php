@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('status_code');
             $table->timestamp('timestamp');
             $table->string('response_time');
+            $table->json('ssl_certi');
             $table->timestamps();
         });
     }
