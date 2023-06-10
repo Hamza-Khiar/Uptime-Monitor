@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('friendly_name');
             $table->string('url');
             $table->boolean('active')->default(true);
+            $table->boolean('is_paused')->default(false);
             $table->bigInteger('total_uptime');
+            $table->json('ssl_certificate');
             $table->integer('interval');
             $table->json('tags');
             $table->timestamps();

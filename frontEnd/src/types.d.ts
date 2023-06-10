@@ -23,3 +23,10 @@ export type Rules = {
 export interface IForm {
   [index: string]: FormDataEntryValue | string | any
 }
+export type MonitorData = {
+    totalMonitors:number|null,
+    up:number|null,
+    down:number|null,
+    paused:number|null,
+    sslCertificateCount:number|null
+}

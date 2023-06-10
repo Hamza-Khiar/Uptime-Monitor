@@ -6,13 +6,6 @@ import { formValidate } from '@/helpers/FormHandler'
 import { ref } from 'vue'
 import { fetchFn } from '@/helpers/FetchFn'
 
-/**
- * *******************************************************
- *    SEPERATOR  'cuz why not'
- *    CleanCode 101 :)
- * *******************************************************
- */
-
 let errorForm = ref()
 let verifyUser = ref()
 
@@ -40,7 +33,7 @@ async function handleSubmition(ev: Event) {
   })
   if (!validateForm.length) {
     errorForm.value = null
-    let response = await fetchFn(BACKEND_URL + '/register', 'POST', JSON.stringify(formData), true)
+    let response = await fetchFn(BACKEND_URL + '/register', 'POST', true,JSON.stringify(formData))
     let result = await response.json()
     if ('Error' in result) {
       errorForm.value = [result['Error']]
