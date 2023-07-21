@@ -19,4 +19,5 @@ Route::get('/validated_user/{id}', [UserController::class, 'validateUser']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard', [MonitorController::class, 'index']);
+    Route::post('/newMonitor',[MonitorController::class,'newMonitor']);
 });

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('url');
             $table->boolean('active')->default(true);
             $table->boolean('is_paused')->default(false);
-            $table->bigInteger('total_uptime');
-            $table->json('ssl_certificate');
+            $table->unsignedBigInteger('total_uptime')->nullable();
+            $table->json('ssl_certificate')->nullable();
             $table->integer('interval');
             $table->json('tags');
             $table->timestamps();

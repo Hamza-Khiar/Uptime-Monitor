@@ -31,7 +31,7 @@ class UserController extends Controller
          */
         $form_validation = $request->validated();
         // check if there is a user with already in the db to make an attempt
-        $user = DB::table('users')->where('email', '=', $form_validation['email'])->get(['email', 'password']);
+        $user = DB::table('users')->where('email', '=', $form_validation['email'])->get(['email', 'password','verified_at']);
         if ($user->isEmpty()) {
             return response()->json([
                 'Error' => 'the provided credentials doesn\'t exist in our records, please register '
@@ -42,6 +42,10 @@ class UserController extends Controller
                 'Error' => 'the provided credentials are mismatched with our record; please check the email or password'
             ]);
         }
+        if (!$user->value('verified_at')) {
+            return response()->json(['Error' => 'this user isn\'t validated yet, please check your email']);
+        }
+
         if (Auth::attempt($form_validation)) {
             $request->session()->regenerate();
             return response()->json([

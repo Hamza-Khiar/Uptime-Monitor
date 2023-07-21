@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { inject } from 'vue';
 import { RouterLink } from 'vue-router'
 /**
  * what logic should be contained in the navbar besides the interlinks
@@ -9,7 +10,9 @@ import { RouterLink } from 'vue-router'
  *
  * getting the data as proprs from the layout of the page
  *
- */
+ */ 
+
+let userdata = inject('userdata')
 
 </script>
 
@@ -24,7 +27,7 @@ import { RouterLink } from 'vue-router'
       </ul>
     </nav>
     <div class="profile-bar w-full bg-slate-400 h-10">
-        <p>UserName</p>
+        <p>{{userdata?.body?.User?.username}}</p>
     </div>
   </div>
 </template>

@@ -1,58 +1,62 @@
 <script setup lang="ts">
 import CardMonitorsComp from '@/components/CardMonitorsComp.vue'
 import DashboardLayout from '../layouts/DashboardLayout.vue'
+import NewMonitorModal from '@/components/NewMonitorModal.vue'
 
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, provide, ref } from 'vue'
 import { fetchFn } from '@/helpers/FetchFn'
-import { MonitorData } from '@/types'
+import type { TMonitor, TMonitorMetadata } from '@/types'
 import { AUTH_BACKEND_URL } from '@/env'
 import router from '@/router'
 
-// have a beforeMounted hook to the page for fetching data & also to check whether the session cookie expired
 
 
-let fetchedData = ref<{ body: { User: {}[], Monitors: object[] } }>();
-let loading = ref(false);
-let monitors = ref<Array<object>>([]);
-let monitorsMetadata = ref<MonitorData>({ totalMonitors: null, up: null, down: null, paused: null, sslCertificateCount: null });
+let fetchedData = ref<{ body: { User: { email: string, username: string }; Monitors: TMonitor[] } }>()
+let loading = ref(false)
+let monitors = ref<TMonitor[]>([])
+let monitoMetadata = ref<TMonitorMetadata>()
+
+let newMonitorDisplayed = ref<boolean>(false)
+
+
 onBeforeMount(async () => {
     loading.value = true
     let response = await fetchFn(AUTH_BACKEND_URL + '/dashboard', 'GET', false)
     if (response.status != (401 || 419)) {
         let result = await response.json()
-        fetchedData.value = result;
+        fetchedData.value = result
         monitors.value = fetchedData.value?.body.Monitors
         console.log(fetchedData.value?.body)
         if (monitors.value.length > 0) {
-            console.log(monitorsMetadata.value)
-            return monitorsMetadata.value = monitorsMetadataObjMaker(monitors.value)
+            loading.value = false
+            return monitoMetadata.value = monitorsMetadataObjMaker(monitors.value)
         }
         loading.value = false
-        console.log(monitorsMetadata.value)
         return monitors.value
     }
     return router.replace('login')
 })
 
-const monitorsMetadataObjMaker = function (monitorsMetadata: MonitorData[]): MonitorData {
-    let monitorsMetadataObj: MonitorData = { totalMonitors: 0, up: 0, down: 0, paused: 0, sslCertificateCount: 0 }
-    monitorsMetadataObj.totalMonitors = monitorsMetadata.length
-    monitorsMetadata.forEach(monitor => {
-        monitorsMetadataObj.up = monitor.up ? monitorsMetadataObj.up + 1 : monitorsMetadataObj.up
-        monitorsMetadataObj.down = monitor.down ? monitorsMetadataObj.down + 1 : monitorsMetadataObj.down
-        monitorsMetadataObj.paused = monitor.paused ? monitorsMetadataObj.paused + 1 : monitorsMetadataObj.paused
-        monitorsMetadataObj.sslCertificateCount = monitor.sslCertificateCount ? monitorsMetadataObj.sslCertificateCount + 1 : monitorsMetadataObj.sslCertificateCount
+
+const monitorsMetadataObjMaker = function (fetchedMonitorData: TMonitor[]): TMonitorMetadata {
+
+    // what should this function do, 
+    // this should read the Monitors [] & format a MonitorMetaData object and return it 
+    let monitorsMetadataObj: TMonitorMetadata = { totalMonitors: 0, up: 0, down: 0, paused: 0, sslCertCount: 0 }
+    monitorsMetadataObj.totalMonitors = fetchedMonitorData.length
+    fetchedMonitorData.forEach((monitor) => {
+        monitorsMetadataObj.up = monitor['active'] ? monitorsMetadataObj.up + 1 : monitorsMetadataObj.up
+        monitorsMetadataObj.paused = monitor['is_paused'] ? monitorsMetadataObj.paused + 1 : monitorsMetadataObj.paused
+        monitorsMetadataObj.sslCertCount = monitor['ssl_certificate'] ? monitorsMetadataObj.sslCertCount + 1 : monitorsMetadataObj.sslCertCount
     })
+    monitorsMetadataObj.down = monitorsMetadataObj.up - monitorsMetadataObj.totalMonitors ? monitorsMetadataObj.down + 1 : monitorsMetadataObj.down
     console.log(monitorsMetadataObj)
     return monitorsMetadataObj
 }
 
-/**
- * the logic that needs to be written:
- *    * when fetching all the resources, fill the monitors-data widgets; (monitors.length, activeCount, inactiveCount, tags.has(paused), SSL_CertCount)
- *      if they're all null/0 display 0's
- *    * pass in the monitors array to the CardMonitorsComp
- */
+provide('userdata', fetchedData)
+
+
 </script>
 
 <template>
@@ -61,59 +65,62 @@ const monitorsMetadataObjMaker = function (monitorsMetadata: MonitorData[]): Mon
 
         <!-- the layout will get the props from the fetch reactive object and feed the appropriate data to the DashboardNav  -->
         <div class="w-full overflow-x-hidden">
-            <div class="dashboard-container flex flex-col h-full w-10/12 mx-auto pl-5">
+            <div class="dashboard-container flex flex-col h-full w-10/12 mx-auto pl-5"
+                :class="{ 'blur-[6px]': newMonitorDisplayed }">
                 <div class="header-greet flex justify-between my-28">
-                    <h2 class="text-4xl">Greetings {{ fetchedData?.body.User[0].username }}</h2>
-                    <button class="w-64 h-10 bg-red-300 rounded-md flex items-center justify-between px-4">
-                        New Monitor <svg xmlns="http://www.w3.org/2000/svg" width="27" height="26" viewBox="0 0 27 26"
-                            fill="none">
-                            <circle cx="13.0916" cy="13" r="12.9524" fill="#E3A4A4" />
+                    <h2 class="text-4xl">Greetings {{ fetchedData?.body.User.username }}</h2>
+                    <button class="w-64 h-10 bg-emerald-500 rounded-md flex items-center justify-between px-4"
+                        @click="newMonitorDisplayed = !newMonitorDisplayed" :disabled="newMonitorDisplayed">
+                        New Monitor
+                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="26" viewBox="0 0 27 26" fill="none">
+                            <circle cx="13.0916" cy="13" r="12.9524" fill="#24FF8A" />
                             <path d="M13.0916 6.52382V13V19.4762" stroke="black" stroke-width="2" />
                             <path d="M19.5678 13L13.0916 13L6.61538 13" stroke="black" stroke-width="2" />
                         </svg>
                     </button>
                 </div>
-                <div v-if="monitors.length">
+                <div v-if="loading || monitors.length">
                     <div class="monitors-data flex gap-4 mb-24">
                         <div class="w-80 h-44 bg-slate-300 rounded-3xl px-4 py-10 flex flex-col justify-between">
                             <h2 class="text-3xl">total monitors</h2>
-                            <p class="text-2xl  w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
-                                {{ monitorsMetadata.totalMonitors }}
+                            <p class="text-2xl w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
+                                {{ monitoMetadata?.totalMonitors }}
                             </p>
                         </div>
                         <div class="w-80 h-44 bg-slate-300 rounded-3xl px-4 py-10 flex flex-col justify-between">
                             <h2 class="text-3xl">Up</h2>
-                            <p class="text-2xl  w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
-
-                                {{ monitorsMetadata.up }}
+                            <p class="text-2xl w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
+                                {{ monitoMetadata?.up }}
                             </p>
                         </div>
                         <div class="w-80 h-44 bg-slate-300 rounded-3xl px-4 py-10 flex flex-col justify-between">
                             <h2 class="text-3xl">Down</h2>
-                            <p class="text-2xl  w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
-
-                                {{ monitorsMetadata.down }}
+                            <p class="text-2xl w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
+                                {{ monitoMetadata?.down }}
                             </p>
                         </div>
                         <div class="w-80 h-44 bg-slate-300 rounded-3xl px-4 py-10 flex flex-col justify-between">
                             <h2 class="text-3xl">Paused</h2>
-                            <p class="text-2xl  w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
-
-                                {{ monitorsMetadata.paused }}
+                            <p class="text-2xl w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
+                                {{ monitoMetadata?.paused }}
                             </p>
                         </div>
                         <div class="w-80 h-44 bg-slate-300 rounded-3xl px-4 py-10 flex flex-col justify-between">
                             <h2 class="text-3xl">SSL Cert</h2>
-                            <p class="text-2xl  w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
-                                {{ monitorsMetadata.sslCertificateCount }}
+                            <p class="text-2xl w-6 h-8 rounded-full" :class="{ 'animated-monitor-data': loading }">
+                                {{ monitoMetadata?.sslCertCount }}
                             </p>
                         </div>
                     </div>
-                    <CardMonitorsComp />
+                    <CardMonitorsComp :monitors=monitors />
                 </div>
                 <div v-else class="text-center text-3xl">
                     <p>Wanna add a monitor !?</p>
                 </div>
+            </div>
+            <div id="new-monitor-modal" class="bg-red-200 w-3/4 h-1/3 absolute top-[20%] left-[20%]"
+                v-if="newMonitorDisplayed">
+                <NewMonitorModal />
             </div>
         </div>
     </DashboardLayout>
@@ -138,3 +145,4 @@ const monitorsMetadataObjMaker = function (monitorsMetadata: MonitorData[]): Mon
     }
 }
 </style>
+

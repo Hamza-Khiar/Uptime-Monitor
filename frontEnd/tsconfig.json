@@ -5,7 +5,7 @@
     "verbatimModuleSyntax": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"] 
+      "@/*": ["./src/*"]
     },
   "moduleResolution":"nodenext"
   },
