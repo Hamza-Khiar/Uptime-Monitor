@@ -10,22 +10,27 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CheckedURL
+class IncidentStateEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    public array $check;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(array $response)
+    public array $incident_info;
+    public string $incident_status;
+
+
+    public function __construct(string $status,array $incident)
     {
-        $this->check=$response;
+        $this->incident_status=$status;
+        $this->incident_info=$incident;
+        // the incident array will have: monitor_id,status_code,at
+        // this won't be broadcasted
     }
 
     /**
-     * Get the channels the event should broadcast on.
+     * Get the channels the event should  broadcast on.
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */

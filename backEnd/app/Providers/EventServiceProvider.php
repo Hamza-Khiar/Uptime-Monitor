@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
-use App\Events\CheckedURL;
-use App\Listeners\BroadcastedCheckResult;
+use App\Events\IncidentStateEvent;
+use App\Listeners\IncidentStateSyncher;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -15,10 +15,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        CheckedURL::class=>[
-            BroadcastedCheckResult::class
+        IncidentStateEvent::class=>[
+            IncidentStateSyncher::class
         ]
-
     ];
 
     /**

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('incidents', function (Blueprint $table) {
             $table->id('id');
-            $table->foreignUuid('check_uuid')->references('check_uuid')->on('checks');
+            $table->foreignId('monitor_id')->references('id')->on('monitors');
             $table->integer('status_code');
             $table->timestamp('first_timestamp');
             $table->timestamp('latest_timestamp')->nullable();

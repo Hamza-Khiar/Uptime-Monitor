@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\IncidentStateEvent;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -50,6 +51,7 @@ class CheckURL implements ShouldQueue
             'monitor_id'=>$this->id,
             'status_code'=>$response->status(),
             'response_time'=>$response_time,
+            'at'=>$carboned_time,
             'ssl_certificate'=>$ssl_check->isValid()
         ];
         // you send the $response_to_broadcast array as an event
@@ -64,12 +66,15 @@ class CheckURL implements ShouldQueue
             'updated_at'=>Carbon::now()
         ]);
         // if the code is 4/5XX
-        if(!$response->successful()){
-            // if the status code indicates a failure:
-            //      - launch
-            DB::table('incidents')->insert([
-                //
-        ]);
+        if($response->failed()){
+            // think about how you'll deal with incidents
+            // basically this
+                /*
+                * i'm making requests to the urls that the user gives me,it's gonna check anyway hence the first insert in DB
+                * but if it's an incident, i have to firstly insert the values of 'first_timestamp','monitor_id' & 'status_code'
+                * then if the next consequent requests fails, i update the lastest_timestamp ²
+                */
+            IncidentStateEvent::dispatch('UP',[$this->id,$response_to_broadcast['status_code'],$carboned_time]);
         }
     }
     public function failed(Throwable $exception)
