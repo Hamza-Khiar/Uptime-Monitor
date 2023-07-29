@@ -21,7 +21,6 @@ class CheckURL implements ShouldQueue
 
     protected string $url;
     protected $id;
-    private bool $is_incident=false;
     /**
      * Create a new job instance.
      */
@@ -41,19 +40,21 @@ class CheckURL implements ShouldQueue
         // the job will basically execute a request to the provided URL, the value that's returned will be either an incident or non-incident check
         // the response time will be recorded with microtimes
 
-        $ssl_check=SslCertificate::createForHostName($this->url);
         $start=microtime(true);
         $response=Http::get($this->url);
         $response_time=microtime(true)-$start;
         $carboned_time=Carbon::now();// to eliminate milliseconds offset for timestamps of a request
+
+        info($response->status());
 
         $response_to_broadcast=[
             'monitor_id'=>$this->id,
             'status_code'=>$response->status(),
             'response_time'=>$response_time,
             'at'=>$carboned_time,
-            'ssl_certificate'=>$ssl_check->isValid()
+            'ssl_certificate'=>SslCertificate::createForHostName($this->url)->isValid()
         ];
+
         // you send the $response_to_broadcast array as an event
         DB::table('checks')->insert([
             'check_uuid'=>Str::uuid(),
@@ -76,9 +77,5 @@ class CheckURL implements ShouldQueue
                 */
             IncidentStateEvent::dispatch('UP',[$this->id,$response_to_broadcast['status_code'],$carboned_time]);
         }
-    }
-    public function failed(Throwable $exception)
-    {
-        info("the request wasn\'t successful $exception ");
     }
 }

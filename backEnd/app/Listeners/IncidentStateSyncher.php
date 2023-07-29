@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 class IncidentStateSyncher
 {
-    protected Carbon $first_timestamp = null;
-    protected Carbon $latest_timestamp = null;
+    protected ?Carbon $first_timestamp = null;
+    protected ?Carbon $latest_timestamp = null;
     /**
      * Create the event listener.
      */
