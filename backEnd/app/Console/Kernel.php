@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
 
         $monitorData = DB::table('monitors')->where('is_paused','=',false)->get(['id','url','interval']);
         foreach($monitorData as $monitor){
-            $schedule->job(new CheckURL($monitor->url,$monitor->id))->cron("*/$monitor->interval * * * *");
+            $schedule->job(new CheckURL($monitor->url,$monitor->id,$monitor->user_id))->cron("*/$monitor->interval * * * *");
         };
     }
 
