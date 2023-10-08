@@ -2,9 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Helpers\Types\DBTables;
+use App\Helpers\Types\CurlCases;
+use App\Jobs\notifyUser;
+use App\Models\User;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Spatie\SslCertificate\SslCertificate;
 
@@ -14,7 +17,6 @@ class UptimeCheck
     // why i'm making this helper class
     //      to help me with the thick logic of the job, mainly what i'm doing is, make a request, raise event (incident & check) push to db
     //
-    private const _UNRESOLVED_DNS_CURL_ERRNUM=6;
 
     protected string $url;
     protected string $monitor_id;
@@ -24,10 +26,9 @@ class UptimeCheck
     {
         $this->url = $url;
         $this->monitor_id = $monitor_id;
-        $this->user_id = $user_id;
+        $this->user_id =$user_id;
     }
 
-    //first method: initCheck
 
     public function initCheck(): array|Exception
     {
@@ -37,7 +38,7 @@ class UptimeCheck
             $response_time = microtime(true) - $start;
             $carboned_time = Carbon::now();
             $response_data = [
-                'monitor_id' => $this->monitor_id,
+                'monitor_id' => $this->user_id,
                 'status_code' => $response->status(),
                 'response_time' => $response_time,
                 'at' => $carboned_time,
@@ -55,7 +56,7 @@ class UptimeCheck
         $curlNumError = $this->trimCurlErrorNum($curlError);
         // make an enum
         match ($curlNumError) {
-            UptimeCheck::_UNRESOLVED_DNS_CURL_ERRNUM => true, // enqueue a new (notification Job) & dispatch incident event
+            CurlCases::UNRESOLVED_DNS_CURLERR->value => $this->dispatchNotifyUser($curlError) // enqueue a new (notification Job) & dispatch incident event
         };
     }
 
@@ -67,21 +68,15 @@ class UptimeCheck
         return $matches[0];
     }
 
-    private function dispatchNotificationJob()
+    private function dispatchNotifyUser(?string $curlErr):UptimeCheck
     {
-        // this will dispatch the notification process, either via Email or provided platform; depends on which the user has set up, if none; use email to notify
+        // check if the user has an Notification assigned to him, if he's notifiable or not
+        $user=User::where('id','=',$this->user_id)->first();
+        $curlErr=explode('(',$curlErr)[0]; // human readable message
+        var_dump($curlErr);
+        notifyUser::dispatch($user,$curlErr);
+        return $this;
     }
-
-    private function raiseIncidentEvent()
-    {
-        // this will raise the incident event & return this for method chaining
-    }
-
-    private function raiseCheckEvent()
-    {
-        // this will raise the check event & return this for method chaining
-    }
-
 
     // actions you need this to make
     // send emails/notification []

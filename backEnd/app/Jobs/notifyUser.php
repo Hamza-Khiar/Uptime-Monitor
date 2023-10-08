@@ -2,12 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Notifications\URLMismatchIncident;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Notification;
 
 class notifyUser implements ShouldQueue
 {
@@ -16,9 +19,14 @@ class notifyUser implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    private Collection $user;
+    private string $error_mesg;
+    public function __construct($user,$error_mesg)
     {
-        //
+        $this->user=$user;
+        $this->error_mesg=$error_mesg;
+
+        $this->onQueue('notifier');
     }
 
     /**
@@ -26,6 +34,7 @@ class notifyUser implements ShouldQueue
      */
     public function handle(): void
     {
+        Notification::send($this->user,new URLMismatchIncident($this->error_mesg));
         //
     }
 }

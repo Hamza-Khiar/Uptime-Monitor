@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
         // $schedule->call();
         // retrieve all the urls in monitor that the users entered; retrieve by join where user::id==Auth::id()
 
-        $monitorData = DB::table('monitors')->where('is_paused','=',false)->get(['id','url','interval']);
+        $monitorData = DB::table('monitors')->where('is_paused','=',false)->get(['id','url','user_id','interval']);
         foreach($monitorData as $monitor){
             $schedule->job(new CheckURL($monitor->url,$monitor->id,$monitor->user_id))->cron("*/$monitor->interval * * * *");
         };

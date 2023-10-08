@@ -29,6 +29,8 @@ class CheckURL implements ShouldQueue
         $this->url = $url;
         $this->monitor_id = $monitor_id;
         $this->user_id=$user_id;
+
+        $this->onQueue('checks');
     }
 
     public function handle(): void
@@ -42,7 +44,7 @@ class CheckURL implements ShouldQueue
         } catch (Exception $error) {
             $uptime_check->treatError($error->getMessage());
         }finally{
-            // this is will run on success or failure
+            // this is will run on both success & failure
         }
 
     }
@@ -51,7 +53,7 @@ class CheckURL implements ShouldQueue
            //  DB::table('checks')->insert([
            //     'check_uuid'=>Str::uuid(),
            //     'monitor_id'=>$this->id,
-           //     'status_code'=>$response_to_broadcast['status_code'],
+           //     'status_cod ffe'=>$response_to_broadcast['status_code'],
            //     'timestamp'=>$carboned_time,
            //     'response_time'=>$response_to_broadcast['response_time'],
            //     'ssl_certificate'=>false,
