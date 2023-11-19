@@ -2,12 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Helpers\Types\CurlCases;
+use App\Events\UptimeCheckProcessed;
 use App\Jobs\notifyUser;
-use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Spatie\SslCertificate\SslCertificate;
 
@@ -30,7 +30,7 @@ class UptimeCheck
     }
 
 
-    public function initCheck(): array|Exception
+    public function initCheck()
     {
         try {
             $start = microtime(true);
@@ -45,7 +45,11 @@ class UptimeCheck
                 'ssl_certificate' => true //$response['ssl_chiHaja']
             ];
             var_dump($response);
-            return $response_data;
+            // this is the case where the request has returned a response [either a success code or a failure code]
+
+            // dispatch check Event
+                // broadcast the check event ; then insert the values in the db
+            UptimeCheckProcessed::dispatch($response);
         } catch (Exception $error) {
             return throw new Exception($error->getMessage());
         }
@@ -53,31 +57,54 @@ class UptimeCheck
 
     public function treatError(string $curlError)
     {
-        $curlNumError = $this->trimCurlErrorNum($curlError);
-        // make an enum
-        match ($curlNumError) {
-            CurlCases::UNRESOLVED_DNS_CURLERR->value => $this->dispatchNotifyUser($curlError) // enqueue a new (notification Job) & dispatch incident event
-        };
+        // what are the different Failures to Consider if a request Failed (curl)
+        // for now i only have the usecase of curlNum 6 & 60
+
+
+        $this->dispatchNotifyUser($curlError); // enqueue a new (notification Job) & dispatch incident event
     }
 
-    private function trimCurlErrorNum(string $curlError)
+    private function dispatchNotifyUser(string $curlErr)
+    {
+        //this should be agnostic to whatever thing it will do, either on a
+
+        // check if the user has an Notification assigned to him, if he's notifiable or not
+        // first a join from users & norification table
+        $userNotification=(array)DB::table('notifications')->rightJoin('users','user_id','=','users.id')->get(['notifier_name','config','user_id','email'])[0];
+
+        $notificationDetails=[
+            'type'=>null,
+            'value'=>null
+        ];
+        $curlErr=explode('(',$curlErr)[0]; // human readable message
+
+        if($userNotification['notifier_name']==NULL){
+            $notificationDetails['type']='mail';
+            $notificationDetails['value']=$userNotification['email'];
+        }else{
+            $notificationDetails['type']='notification';
+            $notificationDetails['value']=[
+                'notifier'=>$userNotification['notifier_name'],
+                'config'=>$userNotification['config']
+            ];
+        };
+        notifyUser::dispatch($notificationDetails,$curlErr);
+
+        // finally i'm pausing the monitor so the schedule won't pull it from db and do a check
+        DB::table('monitors')->where('id','=',$this->monitor_id)->update(
+            ['is_paused'=>true,
+             'active'=>false]
+        );
+
+    }
+
+    public static function trimCurlErrorNum(string $curlError)
     {
         // return the errorNUm
         $curlMessage = explode(":", $curlError)[0];
         preg_match('/\d{1,3}/', $curlMessage, $matches);
         return $matches[0];
     }
-
-    private function dispatchNotifyUser(?string $curlErr):UptimeCheck
-    {
-        // check if the user has an Notification assigned to him, if he's notifiable or not
-        $user=User::where('id','=',$this->user_id)->first();
-        $curlErr=explode('(',$curlErr)[0]; // human readable message
-        var_dump($curlErr);
-        notifyUser::dispatch($user,$curlErr);
-        return $this;
-    }
-
     // actions you need this to make
     // send emails/notification []
     // able to launch events []

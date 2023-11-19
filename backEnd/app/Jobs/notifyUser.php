@@ -2,28 +2,27 @@
 
 namespace App\Jobs;
 
-use App\Notifications\URLMismatchIncident;
+use App\Helpers\NotifiyerUtils;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Notification;
+
 
 class notifyUser implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable;
 
     /**
      * Create a new job instance.
      */
-    private Collection $user;
+    private $notificationDetails;
     private string $error_mesg;
-    public function __construct($user,$error_mesg)
+    public function __construct($notificationDetails,$error_mesg)
     {
-        $this->user=$user;
+        $this->notificationDetails=$notificationDetails;
         $this->error_mesg=$error_mesg;
 
         $this->onQueue('notifier');
@@ -34,7 +33,10 @@ class notifyUser implements ShouldQueue
      */
     public function handle(): void
     {
-        Notification::send($this->user,new URLMismatchIncident($this->error_mesg));
-        //
+        // read the notificationDetails & check whether to send it via mail or via NotificationBroadcastChannel/as a Notification
+       match($this->notificationDetails['type']){
+            'notification'=>true, // send a notification,by an event and make the listener recieve it via a broadcasted channel
+            'mail'=>NotifiyerUtils::viaEmail($this->notificationDetails['value'],$this->error_mesg) // send an email
+        };
     }
 }

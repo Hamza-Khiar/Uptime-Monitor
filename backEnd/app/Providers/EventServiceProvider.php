@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
-use App\Events\IncidentStateEvent;
-use App\Listeners\IncidentStateSyncher;
+
+use App\Events\UptimeCheckProcessed;
+use App\Events\FailedRequestOnCheck;
+use App\Listeners\TreatCheckResponse;
+use App\Listeners\ReportIssueToUser;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -15,8 +18,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        IncidentStateEvent::class=>[
-            IncidentStateSyncher::class
+        // this event for each uptimeCheck & what to do on different status_code
+        UptimeCheckProcessed::class=>[
+            TreatCheckResponse::class,
         ]
     ];
 

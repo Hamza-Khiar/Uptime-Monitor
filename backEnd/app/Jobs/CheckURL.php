@@ -17,7 +17,6 @@ class CheckURL implements ShouldQueue
 
     protected string $url;
     protected $monitor_id;
-    private $response_to_broadcast = [];
     protected $user_id;
 
     /**
@@ -38,22 +37,17 @@ class CheckURL implements ShouldQueue
 
         $uptime_check = new UptimeCheck($this->url, $this->monitor_id,$this->user_id);
         try {
-            $result = $uptime_check->initCheck();
-            $this->response_to_broadcast=$result;
-            // if the returned data was $respone_data[]
+             $uptime_check->initCheck();
         } catch (Exception $error) {
             $uptime_check->treatError($error->getMessage());
-        }finally{
-            // this is will run on both success & failure
         }
-
     }
 }
 
            //  DB::table('checks')->insert([
            //     'check_uuid'=>Str::uuid(),
            //     'monitor_id'=>$this->id,
-           //     'status_cod ffe'=>$response_to_broadcast['status_code'],
+           //     'status_code'=>$response_to_broadcast['status_code'],
            //     'timestamp'=>$carboned_time,
            //     'response_time'=>$response_to_broadcast['response_time'],
            //     'ssl_certificate'=>false,

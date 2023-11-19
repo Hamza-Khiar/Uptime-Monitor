@@ -88,7 +88,7 @@ async function handleSubmition(ev: Event) {
           </div>
         </label>
         <button class="block w-1/2 bg-slate-300 rounded mx-auto p-1" type="submit">register</button>
-        <RouterLink to="/login" class="contents">already registered</RouterLink>
+        <RouterLink to="/login">already registered</RouterLink>
       </form>
     </div>
   </AuthRegistry>

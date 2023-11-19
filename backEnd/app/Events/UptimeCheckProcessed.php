@@ -8,20 +8,18 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
-class CheckedURL
+class UptimeCheckProcessed
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets;
 
-    public array $check;
-
+    public array $check_response;
     /**
      * Create a new event instance.
      */
-    public function __construct(array $response)
+    public function __construct()
     {
-        $this->check=$response;
+        //
     }
 
     /**

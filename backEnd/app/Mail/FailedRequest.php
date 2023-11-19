@@ -9,14 +9,14 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class UrlEdition extends Mailable
+class FailedRequest extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public $error_msg)
     {
         //
     }
@@ -27,7 +27,7 @@ class UrlEdition extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Url Edition',
+            subject: 'Failed Request',
         );
     }
 
@@ -37,7 +37,10 @@ class UrlEdition extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            markdown: 'mail.failed-request-on-check',
+            with:[
+                'errorMessage'=>$this->error_msg
+            ]
         );
     }
 

@@ -45,11 +45,11 @@ const monitorsMetadataObjMaker = function (fetchedMonitorData: TMonitor[]): TMon
     let monitorsMetadataObj: TMonitorMetadata = { totalMonitors: 0, up: 0, down: 0, paused: 0, sslCertCount: 0 }
     monitorsMetadataObj.totalMonitors = fetchedMonitorData.length
     fetchedMonitorData.forEach((monitor) => {
-        monitorsMetadataObj.up = monitor['active'] ? monitorsMetadataObj.up + 1 : monitorsMetadataObj.up
+        monitorsMetadataObj.up = monitor['active'] && !monitor['is_paused'] ? monitorsMetadataObj.up + 1 : monitorsMetadataObj.up
+        monitorsMetadataObj.down = !monitor['active'] && !monitor['is_paused'] ? monitorsMetadataObj.down +1 : monitorsMetadataObj.down
         monitorsMetadataObj.paused = monitor['is_paused'] ? monitorsMetadataObj.paused + 1 : monitorsMetadataObj.paused
         monitorsMetadataObj.sslCertCount = monitor['ssl_certificate'] ? monitorsMetadataObj.sslCertCount + 1 : monitorsMetadataObj.sslCertCount
     })
-    monitorsMetadataObj.down = monitorsMetadataObj.up - monitorsMetadataObj.totalMonitors ? monitorsMetadataObj.down + 1 : monitorsMetadataObj.down
     console.log(monitorsMetadataObj)
     return monitorsMetadataObj
 }
